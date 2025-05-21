@@ -31,16 +31,17 @@ Course Navigation
 
 This course will guide you systematically through the essentials of Python programming:
 
+
 .. toctree::
    :maxdepth: 2
    :caption: Course Modules:
 
-   module0_getting_started_fr
-   module1_variables_and_data_types_fr
-   module2_control_flow_fr
-   module3_data_structures_lists_tuples_fr
-   module4-data-structures-dictionaries-sets_fr
-   module5_functions_fr
+   module0_getting_started
+   module1_variables_and_data_types
+   module2_control_flow
+   module3_data_structures_lists_tuples
+   module4-data-structures-dictionaries-sets
+   module5_functions
 
 .. note::
    As you progress, you'll find mini-projects in each module designed to reinforce your learning and help you apply these concepts in practical ways. We believe in learning by doing!
