@@ -9,7 +9,7 @@ Hey there, fellow AI enthusiast! 👋
 Ever felt like you're playing a high-stakes game of "Guess What the AI Meant" with your code?
 You prompt, it generates, and then... well, sometimes it's magic, and other times...
 
-.. image:: ../_static/images/ai_code_struggle_meme.png
+.. image:: ./_static/images/ai_code_struggle_meme.png
    :alt: Meme: Developer looking confused at a complex spaghetti of AI-generated code.
    :width: 450px
    :align: center
@@ -31,7 +31,7 @@ Without that foundational knowledge, you might find yourself:
 
 This course is built on the idea that a little Python knowledge goes a *long* way in making you a far more effective and less frustrated AI-assisted developer. We start from zero – no prior coding experience needed. Just the ability to type and a desire to make AI your true superpower, not just a magic black box.
 
-.. image:: ../_static/images/python_ai_synergy_meme.png
+.. image:: ./_static/images/python_ai_synergy_meme.png
    :alt: Meme: Developer confidently guiding an AI, both looking productive and happy.
    :width: 450px
    :align: center
