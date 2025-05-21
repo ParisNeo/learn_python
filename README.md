@@ -1,2 +1,2 @@
-# lean_python
+# learn_python
 A comprehensive python courses
