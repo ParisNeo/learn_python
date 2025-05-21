@@ -6,9 +6,9 @@ Module 4 : Structures de Données - Dictionnaires et Ensembles (Sets)
 
 Bienvenue dans le Module 4 ! Nous avons exploré les collections ordonnées avec les listes et les tuples. Maintenant, nous allons plonger dans deux autres structures de données Python puissantes : les **dictionnaires** et les **ensembles (sets)**. Les dictionnaires nous permettent de stocker des données sous forme de paires clé-valeur, offrant un moyen de rechercher rapidement des informations en utilisant un identifiant personnalisé (la clé). Les ensembles, d'autre part, sont des collections non ordonnées d'éléments uniques, parfaits pour des tâches comme la suppression de doublons ou l'exécution d'opérations mathématiques sur les ensembles.
 
-.. image:: /_static/images/dict_set_mindmap.png
+.. image:: ../_static/images/dict_set_mindmap.png
    :alt: Représentation abstraite de dictionnaires (clé-valeur) et d'ensembles (éléments uniques)
-   :width: 350px
+   :width: 700px
    :align: center
 
 Objectifs d'apprentissage

@@ -6,9 +6,9 @@ Module 2: Control Flow - Making Decisions and Repeating Actions
 
 Welcome to Module 2! In the previous module, we learned how to store and manage data using variables and different data types. Now, we'll explore how to control the *flow* of our programs. This means making decisions based on certain conditions and repeating tasks efficiently. These are fundamental concepts that give your programs intelligence and power.
 
-.. image:: /_static/images/flowchart_decision.png
+.. image:: ../_static/images/flowchart_decision.png
    :alt: Flowchart showing a decision point and a loop
-   :width: 300px
+   :width: 700px
    :align: center
 
 Learning Objectives

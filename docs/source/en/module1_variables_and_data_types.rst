@@ -6,9 +6,9 @@ Module 1: Variables, Data Types, and User Input
 
 Welcome to Module 1! Now that you're set up and have written your first Python program, it's time to dive into how Python handles data. We'll explore variables (how to store information) and the different types of data you'll encounter. We'll also learn how to make your programs interactive by getting input from the user.
 
-.. image:: /_static/images/data_blocks.png
+.. image:: ../_static/images/data_blocks.png
    :alt: Colorful blocks representing different data types
-   :width: 250px
+   :width: 700px
    :align: center
 
 

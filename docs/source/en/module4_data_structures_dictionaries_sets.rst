@@ -6,9 +6,9 @@ Module 4: Data Structures - Dictionaries and Sets
 
 Welcome to Module 4! We've explored ordered collections with lists and tuples. Now, we'll dive into two more powerful Python data structures: **dictionaries** and **sets**. Dictionaries allow us to store data as key-value pairs, offering a way to look up information quickly using a custom identifier (the key). Sets, on the other hand, are unordered collections of unique items, perfect for tasks like removing duplicates or performing mathematical set operations.
 
-.. image:: /_static/images/dict_set_mindmap.png
+.. image:: ../_static/images/dict_set_mindmap.png
    :alt: Abstract representation of dictionaries (key-value) and sets (unique items)
-   :width: 350px
+   :width: 700px
    :align: center
 
 Learning Objectives

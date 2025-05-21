@@ -6,9 +6,9 @@ Module 5 : Fonctions - Écrire du Code Réutilisable
 
 Bienvenue dans le Module 5 ! À mesure que nos programmes deviennent plus volumineux et complexes, nous avons besoin de moyens pour organiser notre code, le rendre plus lisible et éviter la répétition. Les **fonctions** sont l'un des blocs de construction les plus fondamentaux pour y parvenir. Une fonction est un bloc de code nommé et réutilisable qui effectue une tâche spécifique. En définissant des fonctions, vous pouvez décomposer votre programme en morceaux plus petits et gérables, ce qui rend votre code plus facile à comprendre, à tester et à maintenir.
 
-.. image:: /_static/images/function_machine.png
+.. image:: ../_static/images/function_machine.png
    :alt: Une machine avec une entrée, un traitement et une sortie, représentant une fonction
-   :width: 300px
+   :width: 700px
    :align: center
 
 

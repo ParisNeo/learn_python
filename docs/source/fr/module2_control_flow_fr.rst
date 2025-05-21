@@ -6,9 +6,9 @@ Module 2 : Flux de Contrôle - Prendre des Décisions et Répéter des Actions
 
 Bienvenue dans le Module 2 ! Dans le module précédent, nous avons appris à stocker et gérer des données en utilisant des variables et différents types de données. Maintenant, nous allons explorer comment contrôler le *flux* de nos programmes. Cela signifie prendre des décisions basées sur certaines conditions et répéter des tâches efficacement. Ce sont des concepts fondamentaux qui donnent à vos programmes intelligence et puissance.
 
-.. image:: /_static/images/flowchart_decision.png
+.. image:: ../_static/images/flowchart_decision.png
    :alt: Organigramme montrant un point de décision et une boucle
-   :width: 300px
+   :width: 700px
    :align: center
 
 

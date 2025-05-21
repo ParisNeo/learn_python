@@ -6,9 +6,9 @@ Module 5: Functions - Writing Reusable Code
 
 Welcome to Module 5! As our programs grow larger and more complex, we need ways to organize our code, make it more readable, and avoid repetition. **Functions** are one of the most fundamental building blocks for achieving this. A function is a named block of reusable code that performs a specific task. By defining functions, you can break down your program into smaller, manageable pieces, making your code easier to understand, test, and maintain.
 
-.. image:: /_static/images/function_machine.png
+.. image:: ../_static/images/function_machine.png
    :alt: A machine with an input, processing, and output, representing a function
-   :width: 300px
+   :width: 700px
    :align: center
 
 

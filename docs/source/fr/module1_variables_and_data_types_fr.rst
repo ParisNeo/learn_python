@@ -6,9 +6,9 @@ Module 1 : Variables, Types de Données et Entrées Utilisateur
 
 Bienvenue dans le Module 1 ! Maintenant que vous êtes configuré et que vous avez écrit votre premier programme Python, il est temps de plonger dans la manière dont Python gère les données. Nous explorerons les variables (comment stocker des informations) et les différents types de données que vous rencontrerez. Nous apprendrons également comment rendre vos programmes interactifs en obtenant des entrées de l'utilisateur.
 
-.. image:: /_static/images/data_blocks.png
+.. image:: ../_static/images/data_blocks.png
    :alt: Blocs colorés représentant différents types de données
-   :width: 250px
+   :width: 700px
    :align: center
 
 

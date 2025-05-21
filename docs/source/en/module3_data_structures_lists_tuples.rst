@@ -8,7 +8,7 @@ Welcome to Module 3! So far, we've learned about individual pieces of data (like
 
 .. image:: ../_static/images/list_tuple_boxes.png
    :alt: Abstract representation of lists and tuples as organized boxes
-   :width: 300px
+   :width: 700px
    :align: center
 
 

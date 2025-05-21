@@ -6,9 +6,9 @@ Module 3 : Structures de Données - Listes et Tuples
 
 Bienvenue dans le Module 3 ! Jusqu'à présent, nous avons appris à connaître les données individuelles (comme les nombres et les chaînes de caractères) et comment contrôler le flux de nos programmes. Mais que faire si vous avez besoin de travailler avec une collection d'éléments, comme une liste de noms d'étudiants, une série de relevés de température, ou les coordonnées d'un point ? C'est là qu'interviennent les structures de données. Dans ce module, nous nous concentrerons sur deux types de séquences fondamentaux en Python : les **listes** et les **tuples**.
 
-.. image:: /_static/images/list_tuple_boxes.png
+.. image:: ../_static/images/list_tuple_boxes.png
    :alt: Représentation abstraite de listes et tuples comme des boîtes organisées
-   :width: 300px
+   :width: 700px
    :align: center
 
 
