@@ -10,6 +10,9 @@ version = '0.1'
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
 
+html_static_path = ['_static']
+html_favicon = 'favicon.ico'
+
 extensions = [
     'sphinx.ext.autodoc',    # If you have Python code to document
     'sphinx.ext.intersphinx',
