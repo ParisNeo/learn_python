@@ -19,7 +19,7 @@ Ce cours comble cette lacune. Il est conçu pour :
 
 Notre objectif n'est pas seulement de vous enseigner la syntaxe Python, mais de vous doter des capacités de réflexion et de résolution de problèmes qui feront de vous un développeur plus compétent et indépendant, même en travaillant aux côtés de puissants outils d'IA.
 
-.. image:: ../_static/images/ai_coding_meme_placeholder.png
+.. image:: ../_static/images/ai_coding_meme_placeholder_fr.png
    :alt: Espace réservé - Mème illustrant les défis du codage IA sans compétences de base
    :width: 400px
    :align: center
