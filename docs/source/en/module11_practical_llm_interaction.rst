@@ -285,10 +285,11 @@ Direct Interaction with LLM Bindings (e.g., Ollama, OpenAI)
 
 `LollmsClient` can be initialized to interact with specific bindings, allowing you to leverage models served by Ollama, OpenAI (via API key), or others, all orchestrated through `lollms-client`'s unified API structure.
 
-.. admonition:: Solution (Try it yourself before looking!)
+.. admonition:: Code
    :class: dropdown
 
    .. code-block:: python
+    
         # direct_binding_interaction.py
         from lollms_client import LollmsClient
         from lollms_client.lollms_types import MSG_TYPE
