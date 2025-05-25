@@ -45,7 +45,11 @@ Core `LollmsClient` Initialization and Usage
 
 The `LollmsClient` is your gateway to the `lollms` backend. Its initialization allows for specifying the host, target model, generation parameters, and even the underlying communication binding.
 
-.. code-block:: python
+.. admonition:: Code
+   :class: dropdown
+
+   .. code-block:: python
+    
     # client_setup_example.py
     from lollms_client import LollmsClient, ELF_GENERATION_FORMAT
     from ascii_colors import ASCIIColors # For colored console output
@@ -82,7 +86,11 @@ Advanced Text Processing: Sequential Summarization
 
 For very large documents that exceed an LLM's context window, `lollms-client` offers powerful methods like `sequential_summarize`. This breaks the document into manageable chunks, summarizes each chunk iteratively (maintaining context from previous summaries), and then compiles a final summary.
 
-.. code-block:: python
+.. admonition:: Code
+   :class: dropdown
+
+   .. code-block:: python
+    
     # sequential_summarize_example.py
     from lollms_client import LollmsClient
     import pipmaster as pm
@@ -182,7 +190,11 @@ Text-to-Image (TTI) Generation
 
 `lollms-client` can interact with Text-to-Image services configured in your `lollms` backend. This involves listing services, managing settings, and generating images.
 
-.. code-block:: python
+.. admonition:: Code
+   :class: dropdown
+
+   .. code-block:: python
+    
     # tti_example.py
     from lollms_client import LollmsClient
     from ascii_colors import ASCIIColors, trace_exception
@@ -289,7 +301,7 @@ Direct Interaction with LLM Bindings (e.g., Ollama, OpenAI)
    :class: dropdown
 
    .. code-block:: python
-    
+
         # direct_binding_interaction.py
         from lollms_client import LollmsClient
         from lollms_client.lollms_types import MSG_TYPE
