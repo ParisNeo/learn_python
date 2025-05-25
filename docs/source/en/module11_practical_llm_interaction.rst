@@ -285,94 +285,97 @@ Direct Interaction with LLM Bindings (e.g., Ollama, OpenAI)
 
 `LollmsClient` can be initialized to interact with specific bindings, allowing you to leverage models served by Ollama, OpenAI (via API key), or others, all orchestrated through `lollms-client`'s unified API structure.
 
-.. code-block:: python
-    # direct_binding_interaction.py
-    from lollms_client import LollmsClient
-    from lollms_client.lollms_types import MSG_TYPE
-    from ascii_colors import ASCIIColors, trace_exception
-    from pathlib import Path # For image path
+.. admonition:: Solution (Try it yourself before looking!)
+   :class: dropdown
 
-    # --- Configuration ---
-    # Choose your target binding and its parameters
-    # BINDING_NAME = "ollama"
-    # HOST_ADDRESS = "http://localhost:11434" # Ollama's default
-    # OLLAMA_MODEL_NAME = "llava:latest" # A multi-modal model in Ollama
-    # OLLAMA_IMAGE_PATH = str(Path(__file__).parent / "path_to_your_test_image.jpg") # Replace with actual image path
+   .. code-block:: python
+        # direct_binding_interaction.py
+        from lollms_client import LollmsClient
+        from lollms_client.lollms_types import MSG_TYPE
+        from ascii_colors import ASCIIColors, trace_exception
+        from pathlib import Path # For image path
 
-    BINDING_NAME = "lollms" # Or "openai" if you have OPENAI_API_KEY set
-    HOST_ADDRESS = "http://localhost:9600" if BINDING_NAME == "lollms" else None
-    MODEL_NAME = None # For 'lollms', uses server default. For 'openai', e.g., "gpt-4-turbo"
+        # --- Configuration ---
+        # Choose your target binding and its parameters
+        # BINDING_NAME = "ollama"
+        # HOST_ADDRESS = "http://localhost:11434" # Ollama's default
+        # OLLAMA_MODEL_NAME = "llava:latest" # A multi-modal model in Ollama
+        # OLLAMA_IMAGE_PATH = str(Path(__file__).parent / "path_to_your_test_image.jpg") # Replace with actual image path
 
-    # --- Callback for streaming ---
-    def binding_streaming_callback(chunk: str, msg_type: MSG_TYPE, params=None, metadata=None) -> bool:
-        if msg_type == MSG_TYPE.MSG_TYPE_CHUNK and chunk is not None:
-            print(chunk, end="", flush=True)
-        elif msg_type == MSG_TYPE.MSG_TYPE_EXCEPTION:
-            ASCIIColors.error(f"\nStreaming Error from binding: {chunk}")
-        return True
+        BINDING_NAME = "lollms" # Or "openai" if you have OPENAI_API_KEY set
+        HOST_ADDRESS = "http://localhost:9600" if BINDING_NAME == "lollms" else None
+        MODEL_NAME = None # For 'lollms', uses server default. For 'openai', e.g., "gpt-4-turbo"
 
-    try:
-        client_params = {
-            "binding_name": BINDING_NAME,
-            "host_address": HOST_ADDRESS,
-            "model_name": MODEL_NAME,
-        }
-        if client_params["host_address"] is None and BINDING_NAME in ["openai"]: # OpenAI binding doesn't need host if using official API
-             del client_params["host_address"]
-        
-        lc = LollmsClient(**client_params)
-        ASCIIColors.cyan(f"--- Interacting with '{lc.binding_name}' binding ---")
-        ASCIIColors.info(f"Host: {lc.host_address or 'Default API'}, Model: {lc.binding.model_name or 'Default'}")
+        # --- Callback for streaming ---
+        def binding_streaming_callback(chunk: str, msg_type: MSG_TYPE, params=None, metadata=None) -> bool:
+            if msg_type == MSG_TYPE.MSG_TYPE_CHUNK and chunk is not None:
+                print(chunk, end="", flush=True)
+            elif msg_type == MSG_TYPE.MSG_TYPE_EXCEPTION:
+                ASCIIColors.error(f"\nStreaming Error from binding: {chunk}")
+            return True
 
-        # 1. List models available through this binding
-        ASCIIColors.magenta("\n1. Listing Models from Binding:")
-        models = lc.listModels() # Should list models specific to the binding
-        if isinstance(models, list) and models:
-            ASCIIColors.green("Available models:")
-            for m_info in models[:5]: # Show first 5
-                 model_id = m_info.get('model_name', m_info.get('id', str(m_info)))
-                 print(f"  - {model_id}")
-        else:
-            ASCIIColors.yellow(f"No models listed or error: {models}")
+        try:
+            client_params = {
+                "binding_name": BINDING_NAME,
+                "host_address": HOST_ADDRESS,
+                "model_name": MODEL_NAME,
+            }
+            if client_params["host_address"] is None and BINDING_NAME in ["openai"]: # OpenAI binding doesn't need host if using official API
+                del client_params["host_address"]
+            
+            lc = LollmsClient(**client_params)
+            ASCIIColors.cyan(f"--- Interacting with '{lc.binding_name}' binding ---")
+            ASCIIColors.info(f"Host: {lc.host_address or 'Default API'}, Model: {lc.binding.model_name or 'Default'}")
 
-        # 2. Text Generation (potentially multi-modal if model and binding support it)
-        ASCIIColors.magenta("\n2. Generating Text (and maybe processing an image):")
-        prompt = "What is the capital of France?"
-        images_for_prompt = []
+            # 1. List models available through this binding
+            ASCIIColors.magenta("\n1. Listing Models from Binding:")
+            models = lc.listModels() # Should list models specific to the binding
+            if isinstance(models, list) and models:
+                ASCIIColors.green("Available models:")
+                for m_info in models[:5]: # Show first 5
+                    model_id = m_info.get('model_name', m_info.get('id', str(m_info)))
+                    print(f"  - {model_id}")
+            else:
+                ASCIIColors.yellow(f"No models listed or error: {models}")
 
-        # Example for Ollama with LLaVA (multi-modal)
-        if lc.binding_name == "ollama" and "llava" in (lc.binding.model_name or "").lower():
-            # Create a dummy image if OLLAMA_IMAGE_PATH doesn't exist
-            # OLLAMA_IMAGE_PATH = "test_ollama_image.png" # Define this path
-            # if not Path(OLLAMA_IMAGE_PATH).exists():
-            #     # Code to create a dummy image (e.g., using Pillow)
-            #     ASCIIColors.yellow(f"Dummy image created/used for LLaVA: {OLLAMA_IMAGE_PATH}")
-            # images_for_prompt = [OLLAMA_IMAGE_PATH]
-            # prompt = "Describe this image in detail."
-            ASCIIColors.yellow("To test LLaVA with Ollama, uncomment image path and set prompt.")
+            # 2. Text Generation (potentially multi-modal if model and binding support it)
+            ASCIIColors.magenta("\n2. Generating Text (and maybe processing an image):")
+            prompt = "What is the capital of France?"
+            images_for_prompt = []
 
-
-        ASCIIColors.yellow(f"Prompt: {prompt}")
-        if images_for_prompt: ASCIIColors.yellow(f"Images: {images_for_prompt}")
-        ASCIIColors.green("Response (streaming):")
-
-        full_response = lc.generate_text(
-            prompt=prompt,
-            images=images_for_prompt if images_for_prompt else None, # Pass images if any
-            stream=True,
-            streaming_callback=binding_streaming_callback,
-            n_predict=200,
-            temperature=0.6
-        )
-        print() # Newline after stream
-
-        if isinstance(full_response, dict) and "error" in full_response:
-            ASCIIColors.error(f"Generation error: {full_response['error']}")
+            # Example for Ollama with LLaVA (multi-modal)
+            if lc.binding_name == "ollama" and "llava" in (lc.binding.model_name or "").lower():
+                # Create a dummy image if OLLAMA_IMAGE_PATH doesn't exist
+                # OLLAMA_IMAGE_PATH = "test_ollama_image.png" # Define this path
+                # if not Path(OLLAMA_IMAGE_PATH).exists():
+                #     # Code to create a dummy image (e.g., using Pillow)
+                #     ASCIIColors.yellow(f"Dummy image created/used for LLaVA: {OLLAMA_IMAGE_PATH}")
+                # images_for_prompt = [OLLAMA_IMAGE_PATH]
+                # prompt = "Describe this image in detail."
+                ASCIIColors.yellow("To test LLaVA with Ollama, uncomment image path and set prompt.")
 
 
-    except Exception as e:
-        ASCIIColors.error(f"An error occurred with binding '{BINDING_NAME}': {e}")
-        trace_exception(e)
+            ASCIIColors.yellow(f"Prompt: {prompt}")
+            if images_for_prompt: ASCIIColors.yellow(f"Images: {images_for_prompt}")
+            ASCIIColors.green("Response (streaming):")
+
+            full_response = lc.generate_text(
+                prompt=prompt,
+                images=images_for_prompt if images_for_prompt else None, # Pass images if any
+                stream=True,
+                streaming_callback=binding_streaming_callback,
+                n_predict=200,
+                temperature=0.6
+            )
+            print() # Newline after stream
+
+            if isinstance(full_response, dict) and "error" in full_response:
+                ASCIIColors.error(f"Generation error: {full_response['error']}")
+
+
+        except Exception as e:
+            ASCIIColors.error(f"An error occurred with binding '{BINDING_NAME}': {e}")
+            trace_exception(e)
 
 *   By setting `binding_name` during `LollmsClient` initialization, you tell the client which internal binding class to use (e.g., `OllamaBinding`, `OpenAIBinding`).
 *   Methods like `generate_text` and `listModels` will then operate in the context of that specific binding.
