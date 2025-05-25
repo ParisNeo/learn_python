@@ -42,6 +42,12 @@ This course will guide you systematically through the essentials of Python progr
    module3_data_structures_lists_tuples
    module4-data-structures-dictionaries-sets
    module5_functions
+   module6_error_handling_exceptions
+   module7_file_io
+   module8_modules_packages
+   module9_oop_intro
+   module10_vibe_coding
+   module11_practical_llm_interaction
 
 .. note::
    As you progress, you'll find mini-projects in each module designed to reinforce your learning and help you apply these concepts in practical ways. We believe in learning by doing!

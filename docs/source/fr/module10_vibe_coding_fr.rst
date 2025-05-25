@@ -1,227 +1,401 @@
-.. _module10-vibe-coding-fr:
+.. _module11-practical-llm-interaction-fr:
 
-===============================================================================
-Module 10 : Vibe Coding - Développement Assisté par IA avec les LLM
-===============================================================================
+====================================================================================
+Module 11 : Orchestration Avancée de LLM avec `lollms-client`
+====================================================================================
 
-Bienvenue dans le Module 10 ! Nous nous aventurons maintenant dans un domaine de pointe qui transforme rapidement le développement logiciel : le **Développement Assisté par IA utilisant les Grands Modèles de Langage (LLM)**. Ce module passe de la syntaxe et des concepts Python traditionnels à une nouvelle compétence : collaborer efficacement avec l'IA pour écrire, déboguer, comprendre et refactoriser du code. C'est ce que nous appellerons le "Vibe Coding" – trouver la bonne synergie avec votre partenaire de codage IA.
+Bienvenue dans le Module 11 ! Nous avons exploré les aspects théoriques du "Vibe Coding" et il est maintenant temps de plonger plus profondément dans des interactions pratiques et avancées avec les Grands Modèles de Langage en utilisant la bibliothèque Python `lollms-client`. Ce module ira au-delà de la génération de texte basique, en montrant comment `lollms-client` peut orchestrer des tâches complexes telles que la résumé séquentiel, la génération de texte vers image (TTI), et l'interaction directe avec diverses liaisons (bindings) LLM comme Ollama ou OpenAI, le tout géré via un backend `lollms`.
 
-.. image:: ../_static/images/ai_pair_programmer.png
-   :alt: Un développeur humain et un robot IA collaborant devant un ordinateur
+Ce module pratique vous permettra de construire des applications Python assistées par IA sophistiquées.
+
+.. image:: ../_static/images/ai_orchestration.png
+   :alt: Un chef d'orchestre (script Python) dirigeant un orchestre de modèles et d'outils IA
    :width: 650px
    :align: center
 
-Les LLM de pointe actuels (comme la série GPT d'OpenAI, Claude d'Anthropic, Gemini de Google, et les modèles open-source comme Llama) ont démontré des capacités remarquables à comprendre et générer du texte de type humain, et de manière impressionnante, du code informatique dans divers langages de programmation.
+**Prérequis Importants :**
+1.  **Une instance de `lollms` en cours d'exécution :** Votre `lollms-webui` (ou serveur headless) doit être opérationnel (par défaut : `http://localhost:9600`). Pour des fonctionnalités spécifiques comme le TTI ou l'utilisation directe de liaisons Ollama/OpenAI, assurez-vous que les modèles et services pertinents sont correctement configurés et actifs dans votre environnement `lollms`.
+2.  **La bibliothèque `lollms-client` et ses dépendances installées.**
+3.  **Optionnel (pour des exemples spécifiques) :**
+    *   `pipmaster` et `docling` pour l'exemple de résumé.
+    *   `Pillow` (PIL) pour le traitement d'images dans les exemples TTI.
+    *   Un serveur Ollama en cours d'exécution si vous testez la liaison Ollama, avec des modèles comme `llava` ou `llama3` téléchargés.
+    *   Une clé API OpenAI si vous testez la liaison OpenAI.
 
 Objectifs d'Apprentissage
 -------------------
 
 À la fin de ce module, vous serez capable de :
 
-*   Comprendre l'état actuel de l'art et le potentiel des LLM pour le codage.
-*   Saisir les concepts fondamentaux des LLM : taille du modèle, tokens, fenêtres de contexte, et les bases du fonctionnement des modèles Transformer pour générer du texte.
-*   Comprendre comment les LLM sont entraînés et comment la taille du modèle impacte les capacités.
-*   Reconnaître les limitations courantes des LLM et les types d'erreurs dans la génération de code.
-*   Développer des stratégies pour des requêtes (prompts) efficaces afin de maximiser la qualité du code généré par l'IA.
-*   Apprendre des techniques pour utiliser les LLM dans le débogage, la refactorisation et la documentation.
-*   Apprécier l'importance de la supervision humaine, de la revue critique et de l'affinement itératif lors du travail avec les LLM.
-*   Comprendre le concept de "tâches atomiques" pour l'assistance LLM et les idées émergentes d'"agentification".
-*   Vous préparer à une interaction pratique avec les LLM dans le prochain module.
+*   Initialiser `LollmsClient` pour divers backends et interactions avec des modèles spécifiques.
+*   Effectuer des tâches de traitement de texte avancées comme `sequential_summarize` pour de grands documents.
+*   Utiliser les capacités de Texte-vers-Image (TTI) de `lollms-client` pour :
+    *   Lister les services TTI disponibles.
+    *   Obtenir et (conceptuellement) définir les paramètres du service TTI.
+    *   Générer des images à partir de prompts textuels.
+*   Interagir directement avec différentes liaisons LLM (par ex., `lollms` par défaut, `ollama`, `openai`) via `LollmsClient`.
+*   Gérer efficacement les réponses en streaming avec des callbacks personnalisés.
+*   Intégrer des entrées multimodales (texte et images) pour la génération avec des modèles capables.
+*   Comprendre la gestion des erreurs du client et les structures de réponse.
 
 ----------------------------------------------------
 
-La Révolution LLM dans le Codage
-================================
+Initialisation et Utilisation de Base de `LollmsClient`
+=======================================================
 
-Les Grands Modèles de Langage sont un type d'intelligence artificielle entraîné sur de vastes quantités de texte et de code. Ils apprennent les motifs, la syntaxe, la sémantique, et même les idiomes de codage courants. Cela leur permet d'effectuer une variété de tâches liées au codage :
+Le `LollmsClient` est votre passerelle vers le backend `lollms`. Son initialisation permet de spécifier l'hôte, le modèle cible, les paramètres de génération, et même la liaison de communication sous-jacente.
 
-*   **Génération de Code :** Écrire des fonctions, des classes, ou des scripts entiers basés sur des descriptions en langage naturel.
-*   **Complétion de Code :** Suggérer des continuations pour votre ligne de code actuelle (par ex., GitHub Copilot).
-*   **Assistance au Débogage :** Analyser les messages d'erreur et suggérer des corrections.
-*   **Explication de Code :** Décrire ce que fait un morceau de code en langage clair.
-*   **Traduction de Code :** Convertir du code d'un langage de programmation à un autre.
-*   **Refactorisation :** Restructurer du code existant pour une meilleure lisibilité ou efficacité.
-*   **Documentation :** Générer des commentaires ou des docstrings pour le code.
-*   **Génération de Tests :** Créer des tests unitaires pour des fonctions ou des modules.
+.. code-block:: python
+    # client_setup_example.py
+    from lollms_client import LollmsClient, ELF_GENERATION_FORMAT
+    from ascii_colors import ASCIIColors # For colored console output
 
-**Le Potentiel :**
-Les LLM ont le potentiel de :
-*   **Accélérer le Développement :** Réduire le temps passé sur le code répétitif (boilerplate) ou à chercher des solutions à des problèmes courants.
-*   **Abaisser la Barrière à l'Entrée :** Aider les nouveaux programmeurs à apprendre plus vite en fournissant des exemples et des explications.
-*   **Améliorer la Créativité :** Permettre aux développeurs de se concentrer sur la conception de plus haut niveau et la résolution de problèmes en automatisant les tâches routinières.
-*   **Combler les Lacunes de Connaissances :** Fournir des réponses rapides aux questions de syntaxe ou d'utilisation de bibliothèques.
+    # Default lollms server
+    LOLLMS_HOST = "http://localhost:9600"
 
-**La Réalité - Pas Encore Viable à 100% (Mais Incroyablement Utile) :**
-Bien qu'incroyablement puissants, les LLM ne sont pas infaillibles. Ils peuvent :
-*   Produire du code qui semble plausible mais est subtilement incorrect ("hallucinations").
-*   Générer des solutions inefficaces ou non optimales.
-*   Manquer des cas limites ou des vulnérabilités de sécurité.
-*   Avoir des difficultés avec des problèmes très nouveaux ou très complexes sans une aide significative.
-*   Refléter les biais présents dans leurs données d'entraînement.
+    try:
+        # Basic client for default lollms server interaction
+        lc_default = LollmsClient(host_address=LOLLMS_HOST)
+        ASCIIColors.green(f"Default client initialized for: {lc_default.host_address}")
+        ASCIIColors.info(f"Using binding: {lc_default.binding_name}, Model: {lc_default.binding.model_name if lc_default.binding else 'N/A'}")
 
-**La Clé :** Vos compétences de codage existantes (comme celles que vous avez développées tout au long de ce tutoriel !) sont *plus importantes que jamais*. Vous avez besoin de ces connaissances pour :
-*   **Formuler des requêtes (prompts) efficaces.**
-*   **Évaluer de manière critique la sortie de l'IA.**
-*   **Déboguer et adapter le code généré.**
-*   **Intégrer l'assistance de l'IA de manière transparente dans votre flux de travail.**
+        # Example: Client targeting an Ollama binding (if lollms is configured to proxy it or client talks directly)
+        # Ensure Ollama server is running, e.g., at http://localhost:11434
+        # lc_ollama = LollmsClient(
+        #     binding_name="ollama", # Instructs client to use OllamaBinding
+        #     host_address="http://localhost:11434", # Ollama's direct address
+        #     model_name="llama3:latest" # Specific model in Ollama
+        # )
+        # ASCIIColors.green(f"\nOllama client initialized for: {lc_ollama.host_address}")
+        # ASCIIColors.info(f"Using binding: {lc_ollama.binding_name}, Model: {lc_ollama.binding.model_name}")
 
-Avec la bonne approche, vous pouvez tirer parti des LLM pour "construire les applications de vos rêves" de manière plus efficiente et efficace. Le LLM devient un assistant surpuissant, mais *vous* restez l'architecte et le développeur principal.
+    except Exception as e:
+        ASCIIColors.error(f"Error during client initialization: {e}")
+
+*   Le paramètre `binding_name` dans `LollmsClient` est crucial pour indiquer au client comment communiquer et avec quel type de service (par ex., "lollms" pour l'API LoLLMs standard, "ollama", "openai").
+*   `host_address` et `model_name` sont ensuite interprétés en fonction de la liaison choisie.
 
 ----------------------------------------------------
 
-Comprendre les Fondamentaux des LLM pour les Codeurs
-===================================================
+Traitement de Texte Avancé : Résumé Séquentiel
+==============================================
 
-Pour "vibrer" efficacement avec un LLM, il est utile de comprendre un peu comment ils fonctionnent.
+Pour les documents très volumineux qui dépassent la fenêtre de contexte d'un LLM, `lollms-client` offre des méthodes puissantes comme `sequential_summarize`. Celle-ci divise le document en morceaux gérables, résume chaque morceau de manière itérative (en maintenant le contexte des résumés précédents), puis compile un résumé final.
 
-1.  **Taille du Modèle (Paramètres) :**
-    *   Les LLM sont souvent caractérisés par le nombre de "paramètres" qu'ils possèdent (par ex., des milliards voire des billions). Les paramètres sont, très grossièrement, les valeurs apprises au sein du réseau neuronal du modèle qui stockent ses connaissances.
-    *   **Effet de la Taille :** Généralement, les modèles plus grands (plus de paramètres) tendent à avoir :
-        *   Une meilleure compréhension des instructions complexes.
-        *   Des connaissances plus étendues.
-        *   Des capacités de raisonnement plus fortes.
-        *   Une meilleure qualité de génération de code sur un plus large éventail de tâches.
-        *   Un coût de calcul plus élevé pour l'entraînement et l'exécution.
-    *   Les modèles plus petits peuvent toujours être très utiles, en particulier pour des tâches spécifiques et bien définies, et peuvent être exécutés localement sur du matériel grand public.
+.. code-block:: python
+    # sequential_summarize_example.py
+    from lollms_client import LollmsClient
+    import pipmaster as pm
+    from ascii_colors import ASCIIColors
 
-2.  **Tokens (Jetons) :**
-    *   Les LLM ne traitent pas le texte comme des caractères individuels ou des mots directement. Ils décomposent le texte en "tokens".
-    *   Un token peut être un mot entier, une partie d'un mot (par ex., "ant"), un signe de ponctuation, ou même un espace. Pour le code, les tokens peuvent aussi représenter des opérateurs, des mots-clés, ou des parties de noms de variables.
-    *   Exemple : "print('Bonjour, monde !')" pourrait être tokenisé en `["print", "(", "'", "Bonjour", ",", " monde", "'", ")"]`. La tokenisation exacte dépend du tokeniseur du modèle.
-    *   **Pourquoi c'est important :** Les fenêtres de contexte des LLM et la tarification sont souvent basées sur le nombre de tokens.
+    # Ensure docling is installed for document conversion
+    if not pm.is_installed("docling"):
+        ASCIIColors.info("Installing docling...")
+        pm.install("docling")
+    from docling.document_converter import DocumentConverter
 
-3.  **Fenêtre de Contexte :**
-    *   C'est le nombre maximum de tokens qu'un LLM peut "voir" ou considérer en même temps lors du traitement d'une entrée et de la génération d'une sortie.
-    *   Elle inclut à la fois votre requête (prompt) d'entrée et la réponse générée.
-    *   Exemple : Un modèle avec une fenêtre de contexte de 4096 tokens peut gérer une longueur combinée entrée/sortie de 4096 tokens.
-    *   **Effet de la Taille :** Des fenêtres de contexte plus grandes permettent au modèle de :
-        *   Comprendre des requêtes plus complexes avec plus d'informations contextuelles.
-        *   Maintenir la cohérence sur des conversations plus longues ou des tâches de génération de code plus étendues.
-        *   Travailler avec des bases de code ou des fichiers plus volumineux fournis en contexte.
-    *   Si votre entrée + la sortie désirée dépasse la fenêtre de contexte, le modèle pourrait "oublier" les parties antérieures de la conversation ou tronquer sa réponse.
+    ASCIIColors.set_log_file("lollms_client_module_log.log") # Optional logging
 
-4.  **Comment les Modèles Basés sur Transformer Génèrent du Texte (Simplifié) :**
-    *   La plupart des LLM modernes sont basés sur l'architecture **Transformer**.
-    *   **Auto-Attention (Self-Attention) :** Un mécanisme clé dans les Transformers qui permet au modèle de pondérer l'importance des différents tokens dans la séquence d'entrée lors du traitement d'un token donné. Cela l'aide à comprendre les relations entre les mots/tokens, même s'ils sont éloignés.
-    *   **Prédire le Prochain Token :** Fondamentalement, un LLM, lorsqu'il génère du texte ou du code, prédit de manière répétée le *prochain token* le plus probable étant donné la séquence de tokens qu'il a vue jusqu'à présent (à la fois la requête d'entrée et ce qu'il a déjà généré).
-    *   Il le fait en passant l'entrée à travers de nombreuses couches de son réseau neuronal. La dernière couche produit une distribution de probabilité sur tous les tokens possibles de son vocabulaire. Le modèle choisit alors (généralement) le token avec la plus haute probabilité (ou échantillonne à partir de la distribution) et l'ajoute à la séquence. Cette nouvelle séquence devient alors l'entrée pour prédire le *prochain* token, et ainsi de suite.
-    *   Cette génération pas à pas, token par token, est la raison pour laquelle les LLM peuvent parfois sembler "penser" ou "composer" pendant qu'ils écrivent.
+    try:
+        lc = LollmsClient() # Assumes default http://localhost:9600
+        ASCIIColors.info("LollmsClient initialized for summarization.")
 
-5.  **Entraînement des LLM :**
-    *   **Pré-entraînement :** Les LLM sont d'abord pré-entraînés sur des ensembles de données massifs et diversifiés de texte et de code (par ex., livres, sites web, dépôts de code open-source comme GitHub). Durant cette phase, ils apprennent la grammaire, la syntaxe, les faits, les capacités de raisonnement et les motifs de codage, typiquement en prédisant des mots masqués ou le mot suivant dans une séquence.
-    *   **Affinage (Fine-tuning) (Optionnel mais Courant) :** Après le pré-entraînement, les modèles peuvent être affinés sur des ensembles de données plus petits et plus spécifiques pour améliorer les performances sur des tâches particulières (par ex., suivi d'instructions, génération de code pour un langage spécifique, capacité conversationnelle).
-        *   **Affinage par Instruction :** Entraîner le modèle à suivre des instructions données en langage naturel.
-        *   **Apprentissage par Renforcement à partir du Feedback Humain (RLHF) :** Une technique utilisée pour aligner le comportement du modèle avec les préférences humaines, le rendant plus utile, inoffensif et honnête. Des évaluateurs humains classent différentes réponses du modèle, et ce feedback est utilisé pour entraîner un "modèle de récompense" qui guide ensuite l'affinage du LLM.
+        # Example: Summarize an online PDF (ensure network access)
+        # Replace with a URL of a text-heavy document or a long local text file
+        # article_url = "https://arxiv.org/pdf/2109.09572" # Example ArXiv paper
+        # For a local file, you'd read its content into article_text
+        # For this example, let's use a long string to avoid external dependencies for running the snippet easily
+        article_text = """
+        The field of artificial intelligence (AI) has seen remarkable advancements in recent years,
+        particularly in the domain of natural language processing (NLP). Large Language Models (LLMs)
+        have emerged as powerful tools capable of understanding, generating, and manipulating human
+        language with unprecedented fluency. This document explores the architecture of LLMs,
+        focusing on the Transformer model which underpins many state-of-the-art systems.
+        Transformers utilize a mechanism called self-attention, allowing them to weigh the
+        importance of different parts of the input sequence when processing information.
+        This enables them to handle long-range dependencies effectively.
+        Training these models typically involves two stages: pre-training on vast unlabeled
+        text corpora, followed by fine-tuning on smaller, task-specific datasets.
+        The ethical implications of LLMs, including bias, misinformation, and potential misuse,
+        are also critical areas of ongoing research and discussion. As LLMs become more integrated
+        into various applications, ensuring their responsible development and deployment is paramount.
+        Further research is needed to enhance their reasoning capabilities, reduce computational costs,
+        and improve their factual accuracy and robustness against adversarial attacks.
+        The development of smaller, more efficient models is also a key trend.
+        """*5 # Multiply to make it longer for summarization demo
 
-----------------------------------------------------
+        ASCIIColors.info("Simulated article text loaded.")
 
-Capacités, Limitations et Erreurs Courantes des LLM en Codage
-=============================================================
+        # Define the summarization prompt (instructions for the LLM for each chunk)
+        # This prompt guides the LLM on what to extract or how to build the summary iteratively.
+        summarization_instructions = """
+        Please extract the key points and main arguments from this text chunk.
+        Integrate this information with any summary content already provided in the memory.
+        Focus on novel information presented in the current chunk.
+        The goal is to build a comprehensive yet concise summary of the entire document.
+        Maintain a neutral and objective tone.
+        Output the updated summary.
+        """
 
-**Capacités (Rappel) :**
-À mesure que les modèles deviennent plus grands et que l'entraînement s'améliore, leur capacité à gérer des tâches de codage complexes, à comprendre des instructions nuancées et à générer du code de haute qualité augmente. Ils peuvent être fantastiques pour :
-*   Générer du code répétitif (boilerplate).
-*   Traduire des exigences en structures de code initiales.
-*   Expliquer du code inconnu ou des messages d'erreur.
-*   Suggérer des améliorations de refactorisation.
+        # Define the final formatting prompt (how to structure the complete summary)
+        final_report_instructions = """
+        Compile the accumulated information into a final, coherent summary.
+        Organize the summary into logical paragraphs.
+        Ensure the summary flows well and captures all essential aspects of the document.
+        Present the output as a single block of text.
+        ## Final Summary
+        [Place the comprehensive summary here]
+        """
+        ASCIIColors.info("Starting sequential summarization...")
+        # Note: Adjust ctx_size and chunk_size based on your model's capabilities
+        # and the nature of the document. Larger ctx_size for the LLM is generally better.
+        # The 'chunk_size' here is for how DocumentConverter or lc breaks down the input text.
+        summary_output = lc.sequential_summarize(
+            full_text_content=article_text,
+            instruction_prompt=summarization_instructions,
+            output_format_prompt=final_report_instructions, # Use this for final formatting stage
+            # text_format="markdown", # Not a direct param, output_format_prompt implies structure
+            context_size=8192,  # LLM's context size
+            chunk_size=2048,    # How text is chunked for LLM processing
+            # bootstrap_chunk_size=1024, # For initial context building, if needed
+            # bootstrap_steps=1,         # Number of bootstrap steps
+            debug=False # Set to True for verbose output from lollms_client
+        )
 
-**Limitations et Erreurs Courantes :**
+        ASCIIColors.green("\n--- Generated Summary ---")
+        ASCIIColors.yellow(summary_output)
 
-*   **Oubli d'Imports :** Les LLM peuvent générer du code qui utilise des fonctions ou des classes d'une bibliothèque sans inclure l'instruction `import` nécessaire.
-    *   *Votre Rôle :* Ajouter les imports manquants.
-*   **Typage Incorrect ou Import pour le Typage Incorrect :** Ils peuvent utiliser des indications de type pour des classes qui n'ont pas été importées (par ex., `from typing import List` est nécessaire pour `List[int]`). Parfois, ils peuvent même halluciner des imports d'indications de type pour des modules qui ne les fournissent pas directement pour le typage (par ex. essayer `from mon_module import MonTypeDeClasse` alors que `MonTypeDeClasse` n'est pas un véritable alias de type).
-    *   *Votre Rôle :* S'assurer que tous les types utilisés dans les indications sont correctement importés ou définis. Utiliser `from typing import ...` pour les outils de typage standard.
-*   **Erreurs Logiques Subtiles :** Le code peut s'exécuter sans planter mais produire des résultats incorrects en raison d'une logique erronée. C'est souvent le type d'erreur le plus difficile à détecter.
-    *   *Votre Rôle :* Tester et réviser minutieusement la logique.
-*   **Erreurs d'Un Décalage (Off-by-One) :** Courantes dans les boucles ou l'indexation de tableaux/listes.
-    *   *Votre Rôle :* Vérifier attentivement les conditions aux limites.
-*   **Ignorer les Contraintes :** Si vous fournissez des contraintes (par ex., "utiliser uniquement les bibliothèques standard", "optimiser pour la mémoire"), le LLM peut parfois les ignorer.
-    *   *Votre Rôle :* Réitérer les contraintes ou ajuster manuellement le code.
-*   **Utilisation Incorrecte d'API ou Informations Obsolètes :** Les LLM sont entraînés sur des données jusqu'à un certain point. Ils peuvent utiliser des API de bibliothèques obsolètes ou suggérer des fonctions qui ont été dépréciées.
-    *   *Votre Rôle :* Vérifier l'utilisation de l'API par rapport à la documentation actuelle.
-*   **Vulnérabilités de Sécurité :** Le code généré peut introduire par inadvertance des failles de sécurité (par ex., injection SQL, validation d'entrée incorrecte).
-    *   *Votre Rôle :* Effectuer des revues de sécurité, en particulier pour les applications critiques.
-*   **Code Inefficace :** La solution générée peut être correcte mais pas la plus performante.
-    *   *Votre Rôle :* Profiler et optimiser si la performance est critique.
-*   **"Hallucinations" :** Inventer des fonctions, des bibliothèques ou des faits qui n'existent pas.
-    *   *Votre Rôle :* Être sceptique ; vérifier toute construction inconnue.
-*   **Solutions Trop Complexes :** Parfois, un LLM peut produire une solution plus compliquée que nécessaire.
-    *   *Votre Rôle :* Chercher des alternatives plus simples si la solution de l'IA semble alambiquée.
+    except Exception as e:
+        ASCIIColors.error(f"An error occurred during summarization: {e}")
+        # from ascii_colors import trace_exception # Already imported if using from example
+        # trace_exception(e) # For detailed traceback
 
-**Impact de la Taille et de la Qualité du Modèle :**
-*   **Petits LLM (par ex., modèles avec < 7 milliards de paramètres, ou modèles plus grands fortement quantifiés) :**
-    *   Peuvent être utiles pour des tâches très simples et "atomiques" comme compléter une ligne de code, générer une fonction très basique à partir d'un docstring clair, ou expliquer un petit extrait.
-    *   Peuvent avoir des difficultés significatives avec le raisonnement en plusieurs étapes, les requêtes complexes, ou la mémorisation du contexte sur des interactions plus longues.
-    *   Peuvent commettre des erreurs plus fréquentes (comme oublier des imports, des erreurs de syntaxe de base).
-    *   **Risque :** Peuvent parfois entraîner *plus* de temps perdu si vous passez trop de temps à essayer de déboguer leur sortie erronée pour des tâches dépassant leurs capacités. Il est crucial d'adapter la complexité de la tâche aux capacités du modèle.
-*   **Grands LLM de Pointe (par ex., GPT-4, Claude 3 Opus, Gemini Advanced) :**
-    *   Beaucoup plus performants pour les tâches complexes, contexte plus long, moins d'erreurs de base.
-    *   Nécessitent toujours une formulation de requête (prompting) et une revue attentives.
-    *   Souvent accessibles via des API ou des services payants.
-
-**Tâches Atomiques :**
-Décomposer un problème de codage plus important en petites tâches "atomiques", bien définies, est une bonne stratégie lorsque l'on travaille avec n'importe quel LLM, mais surtout avec les plus petits.
-*   Exemple : Au lieu de "Écris un scraper web pour ce site", essayez :
-    1.  "Écris une fonction Python utilisant `requests` pour récupérer le contenu HTML d'une URL donnée."
-    2.  "Étant donné cet extrait HTML [coller l'extrait], écris une fonction Python utilisant `BeautifulSoup` pour extraire toutes les balises `<h2>`."
-    3.  "Écris une fonction Python pour sauvegarder une liste de chaînes dans un fichier CSV."
-*   Cela donne au LLM un objectif plus clair et plus ciblé pour chaque étape, réduisant le risque d'erreurs complexes.
-
-----------------------------------------------------
-
-Stratégies pour un "Vibe Coding" Efficace
-==========================================
-
-1.  **Formuler des Requêtes (Prompts) Claires et Spécifiques :**
-    *   **Soyez Explicite :** Indiquez le langage de programmation, les bibliothèques souhaitées, les formats d'entrée/sortie, et toute contrainte.
-    *   **Fournissez du Contexte :** Incluez des extraits de code existants pertinents, des structures de données, ou des messages d'erreur.
-    *   **Définissez la "Persona" (Optionnel) :** "Agis comme un développeur Python senior..."
-    *   **Spécifiez le Format de Sortie :** "Fournis uniquement le bloc de code Python," "Explique le code étape par étape."
-
-2.  **Affinement Itératif :**
-    *   Ne vous attendez pas à un code parfait du premier coup.
-    *   Donnez votre avis sur la sortie de l'IA et demandez des révisions. "C'est bien, mais peux-tu aussi ajouter la gestion des erreurs pour X ?" ou "La solution précédente avait un bug quand Y. Peux-tu le corriger ?"
-
-3.  **Demandez des Explications :**
-    *   Si vous ne comprenez pas le code généré, demandez au LLM de l'expliquer. "Peux-tu expliquer cette ligne ?" ou "Pourquoi as-tu choisi cette approche ?" C'est crucial pour l'apprentissage.
-
-4.  **Demandez des Alternatives :**
-    *   "Peux-tu me montrer une autre manière de faire cela ?" ou "Existe-t-il une solution plus efficace ?"
-
-5.  **Concentrez-vous sur des Morceaux Petits et Gérables (Tâches Atomiques) :**
-    *   Surtout au début ou avec des modèles moins capables, demandez de l'aide pour des fonctions individuelles ou de petits blocs logiques plutôt que des applications entières.
-
-6.  **La Supervision Humaine est Non Négociable :**
-    *   **Toujours Réviser :** Lisez et comprenez chaque ligne de code générée par l'IA avant de l'intégrer.
-    *   **Toujours Tester :** Écrivez vos propres tests ou utilisez l'IA pour aider à générer des cas de test, puis exécutez-les.
-    *   **Vous êtes Responsable :** En fin de compte, vous êtes propriétaire du code et de tous les bogues ou problèmes qu'il contient.
-
-7.  **Utilisez les LLM pour le Brainstorming et l'Apprentissage :**
-    *   "Quelles sont les manières courantes de gérer X en Python ?"
-    *   "Quels sont les avantages et les inconvénients d'utiliser la bibliothèque Y par rapport à la bibliothèque Z pour cette tâche ?"
-
-8.  **Agentification et Auto-Questionnement (Concepts Émergents) :**
-    *   **Agentification :** L'idée que les LLM agissent davantage comme des agents autonomes capables de décomposer des tâches, de prendre des décisions, et même d'utiliser des "outils" (comme exécuter du code ou rechercher sur le web) pour atteindre un objectif. C'est un domaine de recherche actif (par ex., AutoGPT, BabyAGI).
-    *   **Auto-Questionnement/Réflexion :** Techniques de prompting où vous demandez au LLM de critiquer sa propre sortie ou de poser des questions de clarification avant de générer une réponse finale.
-        *   Exemple de Prompt : "Avant d'écrire le code, liste toutes les ambiguïtés dans ma demande et pose des questions de clarification. Ensuite, décris ton plan. Finalement, écris le code."
-        *   Cela peut parfois conduire à des solutions plus robustes et mieux pensées de la part du LLM.
-
-9.  **Soyez Attentif à la Sécurité et à la Confidentialité :**
-    *   Évitez de coller du code/des données sensibles ou propriétaires dans les interfaces publiques des LLM, sauf si vous comprenez et acceptez les politiques d'utilisation des données du service. Envisagez des solutions LLM sur site ou axées sur la confidentialité pour le travail sensible.
+*   `sequential_summarize` est idéal pour traiter des textes plus longs que la fenêtre de contexte directe du LLM.
+*   `instruction_prompt` : Guide le LLM sur la manière de traiter chaque morceau individuel et de mettre à jour le résumé progressif.
+*   `output_format_prompt` : Indique au LLM comment structurer le résumé combiné final.
+*   `context_size`, `chunk_size` : Paramètres critiques à ajuster en fonction du LLM que vous utilisez avec `lollms`.
 
 ----------------------------------------------------
 
-Préparation pour l'Interaction Pratique avec les LLM
-====================================================
+Génération de Texte vers Image (TTI)
+====================================
 
-Dans le prochain module, nous passerons de la théorie à la pratique. Vous avez appris les fondamentaux de Python, et vous avez maintenant une compréhension conceptuelle de la manière d'aborder le développement assisté par IA.
+`lollms-client` peut interagir avec les services Texte-vers-Image configurés dans votre backend `lollms`. Cela implique de lister les services, de gérer les paramètres et de générer des images.
 
-Nous explorerons l'utilisation d'une bibliothèque Python appelée `lollms-client` (ou un outil accessible similaire) pour :
-*   Se connecter à divers backends LLM (potentiellement des modèles exécutés localement ou basés sur des API, selon la disponibilité et la configuration).
-*   Envoyer des requêtes (prompts) par programmation et recevoir des réponses sous forme de code ou de texte.
-*   Expérimenter la génération de code pour des tâches simples.
-*   Potentiellement explorer les capacités d'IA multimodale (par ex., si l'outil choisi prend en charge des modèles capables de comprendre des images et de générer du code s'y rapportant).
+.. code-block:: python
+    # tti_example.py
+    from lollms_client import LollmsClient
+    from ascii_colors import ASCIIColors, trace_exception
+    from PIL import Image
+    from pathlib import Path
+    import io
+    import os
+    import platform # For os.name and platform.system()
+    import subprocess # for platform.system() == "Darwin" or os.name == 'posix'
 
-Cette expérience pratique consolidera votre compréhension du "Vibe Coding" et vous permettra de commencer à intégrer l'assistance de l'IA dans vos propres projets Python. L'objectif n'est pas seulement d'obtenir du code, mais d'apprendre à avoir un dialogue productif avec un partenaire de codage IA.
+    try:
+        # Initialize LollmsClient, specifying the tti_binding_name if you want to
+        # target a specific TTI binding configured in lollms.
+        # If not specified, it might use a default or require selection.
+        lc = LollmsClient(
+            host_address="http://localhost:9600",
+            tti_binding_name="lollms" # 'lollms' TTI binding often proxies to a service like Automatic1111, ComfyUI, etc.
+                                      # Ensure this binding is active and configured in your lollms server.
+        )
 
-Suite : :ref:`module11-practical-llm-interaction-fr` ! (Le nom du module dépendra de la bibliothèque/outil choisi)
+        if not lc.tti:
+            ASCIIColors.error("TTI binding could not be initialized. Ensure 'lollms' TTI binding is active and configured in your LoLLMs server.")
+            # exit() # In a real script, you might exit or handle this
+        else:
+            # 1. List available TTI services (backends configured in lollms for image generation)
+            ASCIIColors.cyan("\n--- Listing TTI Services ---")
+            services = lc.tti.list_services()
+            if services:
+                ASCIIColors.green("Available TTI Services:")
+                for i, service in enumerate(services):
+                    print(f"  {i+1}. Name: {service.get('name')}, Caption: {service.get('caption')}")
+            else:
+                ASCIIColors.yellow("No TTI services listed. Check lollms TTI configuration.")
+
+            # 2. Get current TTI settings (template/schema for the active service)
+            ASCIIColors.cyan("\n--- Getting Active TTI Settings ---")
+            # This usually returns a settings template that shows what parameters are configurable.
+            settings_template = lc.tti.get_settings()
+            if isinstance(settings_template, list) and settings_template : # Template is a list of setting dicts
+                ASCIIColors.green("Active TTI Settings Template:")
+                for setting_item in settings_template[:5]: # Show first 5 for brevity
+                    print(f"  - Name: {setting_item.get('name')}, Type: {setting_item.get('type')}, Value: {setting_item.get('value')}, Help: {setting_item.get('help')}")
+            elif not settings_template:
+                 ASCIIColors.yellow("No active TTI service or settings template configured on the server.")
+            else:
+                ASCIIColors.yellow(f"Could not retrieve TTI settings or format unexpected: {settings_template}")
+
+            # 3. Generate an Image
+            ASCIIColors.cyan("\n--- Generating Image ---")
+            prompt = "A majestic owl with glowing eyes, perched on a mythical tree, fantasy art"
+            negative_prompt = "blurry, ugly, low quality, watermark, text, human"
+            width = 768
+            height = 512
+            
+            # Ensure output directory exists
+            output_dir = Path.home() / "Documents" / "lollms_generated_images"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_filename = output_dir / "ai_fantasy_owl.png"
+
+            ASCIIColors.info(f"Prompt: {prompt}")
+            ASCIIColors.info(f"Output to: {output_filename}")
+
+            image_bytes = lc.tti.generate_image(
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                width=width,
+                height=height,
+                # Other parameters like 'seed', 'steps', 'cfg_scale' can be passed as kwargs
+                # if supported by the active TTI service in lollms.
+                # E.g., seed=12345
+            )
+
+            if image_bytes:
+                ASCIIColors.green(f"Image generated successfully ({len(image_bytes)} bytes).")
+                try:
+                    image = Image.open(io.BytesIO(image_bytes))
+                    image.save(output_filename)
+                    ASCIIColors.green(f"Image saved as {output_filename}")
+                    # Attempt to open the image
+                    if os.name == 'nt': os.startfile(output_filename)
+                    elif platform.system() == "Darwin": subprocess.call(["open", output_filename])
+                    elif os.name == 'posix': subprocess.call(["xdg-open", output_filename])
+                except Exception as e_save:
+                    ASCIIColors.error(f"Error processing or saving image: {e_save}")
+            else:
+                ASCIIColors.red("Image generation failed (returned empty bytes). Check lollms server logs.")
+
+    except Exception as e:
+        ASCIIColors.error(f"An TTI-related error occurred: {e}")
+        trace_exception(e)
+
+*   `lc.tti` : Accède à l'interface Texte-vers-Image du client.
+*   `lc.tti.list_services()` : Vous informe sur les backends de génération d'images configurés dans `lollms`.
+*   `lc.tti.get_settings()` : Récupère les paramètres configurables pour le service TTI actuellement actif.
+*   `lc.tti.generate_image(...)` : La méthode principale pour la génération d'images, prenant des prompts, des dimensions, et d'autres paramètres spécifiques au service.
+
+----------------------------------------------------
+
+Interaction Directe avec les Liaisons LLM (par ex., Ollama, OpenAI)
+===================================================================
+
+`LollmsClient` peut être initialisé pour interagir avec des liaisons spécifiques, vous permettant de tirer parti des modèles servis par Ollama, OpenAI (via une clé API), ou d'autres, le tout orchestré via la structure API unifiée de `lollms-client`.
+
+.. code-block:: python
+    # direct_binding_interaction.py
+    from lollms_client import LollmsClient
+    from lollms_client.lollms_types import MSG_TYPE
+    from ascii_colors import ASCIIColors, trace_exception
+    from pathlib import Path # For image path
+
+    # --- Configuration ---
+    # Choose your target binding and its parameters
+    # BINDING_NAME = "ollama"
+    # HOST_ADDRESS = "http://localhost:11434" # Ollama's default
+    # OLLAMA_MODEL_NAME = "llava:latest" # A multi-modal model in Ollama
+    # OLLAMA_IMAGE_PATH = str(Path(__file__).parent / "path_to_your_test_image.jpg") # Replace with actual image path
+
+    BINDING_NAME = "lollms" # Or "openai" if you have OPENAI_API_KEY set
+    HOST_ADDRESS = "http://localhost:9600" if BINDING_NAME == "lollms" else None
+    MODEL_NAME = None # For 'lollms', uses server default. For 'openai', e.g., "gpt-4-turbo"
+
+    # --- Callback for streaming ---
+    def binding_streaming_callback(chunk: str, msg_type: MSG_TYPE, params=None, metadata=None) -> bool:
+        if msg_type == MSG_TYPE.MSG_TYPE_CHUNK and chunk is not None:
+            print(chunk, end="", flush=True)
+        elif msg_type == MSG_TYPE.MSG_TYPE_EXCEPTION:
+            ASCIIColors.error(f"\nStreaming Error from binding: {chunk}")
+        return True
+
+    try:
+        client_params = {
+            "binding_name": BINDING_NAME,
+            "host_address": HOST_ADDRESS,
+            "model_name": MODEL_NAME,
+        }
+        if client_params["host_address"] is None and BINDING_NAME in ["openai"]: # OpenAI binding doesn't need host if using official API
+             del client_params["host_address"]
+        
+        lc = LollmsClient(**client_params)
+        ASCIIColors.cyan(f"--- Interacting with '{lc.binding_name}' binding ---")
+        ASCIIColors.info(f"Host: {lc.host_address or 'Default API'}, Model: {lc.binding.model_name or 'Default'}")
+
+        # 1. List models available through this binding
+        ASCIIColors.magenta("\n1. Listing Models from Binding:")
+        models = lc.listModels() # Should list models specific to the binding
+        if isinstance(models, list) and models:
+            ASCIIColors.green("Available models:")
+            for m_info in models[:5]: # Show first 5
+                 model_id = m_info.get('model_name', m_info.get('id', str(m_info)))
+                 print(f"  - {model_id}")
+        else:
+            ASCIIColors.yellow(f"No models listed or error: {models}")
+
+        # 2. Text Generation (potentially multi-modal if model and binding support it)
+        ASCIIColors.magenta("\n2. Generating Text (and maybe processing an image):")
+        prompt = "What is the capital of France?"
+        images_for_prompt = []
+
+        # Example for Ollama with LLaVA (multi-modal)
+        if lc.binding_name == "ollama" and "llava" in (lc.binding.model_name or "").lower():
+            # Create a dummy image if OLLAMA_IMAGE_PATH doesn't exist
+            # OLLAMA_IMAGE_PATH = "test_ollama_image.png" # Define this path
+            # if not Path(OLLAMA_IMAGE_PATH).exists():
+            #     # Code to create a dummy image (e.g., using Pillow)
+            #     ASCIIColors.yellow(f"Dummy image created/used for LLaVA: {OLLAMA_IMAGE_PATH}")
+            # images_for_prompt = [OLLAMA_IMAGE_PATH]
+            # prompt = "Describe this image in detail."
+            ASCIIColors.yellow("To test LLaVA with Ollama, uncomment image path and set prompt.")
+
+
+        ASCIIColors.yellow(f"Prompt: {prompt}")
+        if images_for_prompt: ASCIIColors.yellow(f"Images: {images_for_prompt}")
+        ASCIIColors.green("Response (streaming):")
+
+        full_response = lc.generate_text(
+            prompt=prompt,
+            images=images_for_prompt if images_for_prompt else None, # Pass images if any
+            stream=True,
+            streaming_callback=binding_streaming_callback,
+            n_predict=200,
+            temperature=0.6
+        )
+        print() # Newline after stream
+
+        if isinstance(full_response, dict) and "error" in full_response:
+            ASCIIColors.error(f"Generation error: {full_response['error']}")
+
+
+    except Exception as e:
+        ASCIIColors.error(f"An error occurred with binding '{BINDING_NAME}': {e}")
+        trace_exception(e)
+
+*   En définissant `binding_name` lors de l'initialisation de `LollmsClient`, vous indiquez au client quelle classe de liaison interne utiliser (par ex., `OllamaBinding`, `OpenAIBinding`).
+*   Des méthodes comme `generate_text` et `listModels` fonctionneront alors dans le contexte de cette liaison spécifique.
+*   Pour les modèles multimodaux comme LLaVA via Ollama, le paramètre `images` de `generate_text` est utilisé.
+
+----------------------------------------------------
+
+Résumé du Module 11
+===================
+
+Ce module vous a doté des connaissances nécessaires pour utiliser `lollms-client` pour une gamme d'interactions IA avancées. Vous avez appris à :
+
+*   Initialiser `LollmsClient` à des fins différentes, y compris pour cibler des liaisons spécifiques.
+*   Effectuer un traitement de texte sophistiqué comme `sequential_summarize`.
+*   Interagir avec les services de génération Texte-vers-Image gérés par votre backend `lollms`.
+*   Utiliser directement divers backends LLM (comme Ollama, OpenAI) via le système de liaison du client.
+*   Utiliser efficacement le streaming pour des applications réactives.
+*   Comprendre comment fournir des entrées multimodales (texte + images) à des modèles capables.
+
+`lollms-client` agit comme un puissant orchestrateur, simplifiant l'accès à diverses fonctionnalités d'IA. Cette capacité à contrôler et combiner par programmation différents services d'IA est la clé pour construire des applications innovantes et intelligentes.
+
+**Et Ensuite ? RAG et GraphRAG avec `safe_store` !**
+Dans le prochain module, nous explorerons une technique essentielle pour améliorer les performances et la fiabilité des LLM : la **Génération Augmentée par Récupération (RAG)**. Nous verrons comment fournir aux LLM des connaissances externes à partir de vos propres sources de données. Nous examinerons spécifiquement `GraphRAG`, une forme plus avancée utilisant des graphes de connaissances, et présenterons la bibliothèque `safe_store` comme un outil potentiel pour gérer et interroger les données utilisées dans les systèmes RAG.
+
+Préparez-vous à rendre vos LLM plus intelligents avec des connaissances personnalisées dans :ref:`module12-rag-graphrag-safestore-fr` !

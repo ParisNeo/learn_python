@@ -41,7 +41,12 @@ Ce cours vous guidera systématiquement à travers les bases de la programmation
    module3_data_structures_lists_tuples_fr
    module4-data-structures-dictionaries-sets_fr
    module5_functions_fr
-
+   module6_error_handling_exceptions_fr
+   module7_file_io_fr
+   module8_modules_packages_fr
+   module9_oop_intro_fr
+   module10_vibe_coding_fr
+   module11_practical_llm_interaction_fr
 .. note::
    Au fur et à mesure de votre progression, vous trouverez des mini-projets dans chaque module conçus pour renforcer votre apprentissage et vous aider à appliquer ces concepts de manière pratique. Nous croyons à l'apprentissage par la pratique !
 
